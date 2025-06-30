@@ -21,6 +21,11 @@ struct KeypairResponse {
     secret: String,
 }
 
+// #[get("/")]
+// async fn root() -> impl Responder {
+//     HttpResponse::Ok().body("Solana Actix API running")
+// }
+
 #[post("/keypair")]
 async fn generate_keypair() -> impl Responder {
     let keypair = Keypair::new();
@@ -208,6 +213,11 @@ async fn send_token(req: web::Json<SendTokenRequest>) -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string()); 
+    let addr = format!("0.0.0.0:{}", port); 
+
+    println!("Starting Actix Web server on {}", addr);
+
     HttpServer::new(|| {
         App::new()
             .service(generate_keypair)
@@ -218,7 +228,7 @@ async fn main() -> std::io::Result<()> {
             .service(send_sol)
             .service(send_token)
     })
-    .bind("127.0.0.1:8080")?
+    .bind(addr)?
     .run()
     .await
 }
